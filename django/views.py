@@ -4,6 +4,15 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Item
 from .serializers import ItemSerializer
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'items', ItemViewSet, basename='item')
+
+urlpatterns = [
+    path('', include(router.urls)),
+]
 
 class ItemViewSet(viewsets.ViewSet):
     """
