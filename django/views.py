@@ -7,13 +7,6 @@ from .serializers import ItemSerializer
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-router = DefaultRouter()
-router.register(r'items', ItemViewSet, basename='item')
-
-urlpatterns = [
-    path('', include(router.urls)),
-]
-
 class ItemViewSet(viewsets.ViewSet):
     """
     A ViewSet for handling Item CRUD operations.
@@ -78,3 +71,11 @@ class ItemViewSet(viewsets.ViewSet):
             
         item.delete()
         return Response({"message": "Item deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+
+router = DefaultRouter()
+router.register(r'items', ItemViewSet, basename='item')
+
+urlpatterns = [
+    path('', include(router.urls)),
+]
