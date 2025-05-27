@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 import sqlite3
+import os
 
 app = FastAPI(title="Inventory Management API", version="1.0.0")
 
@@ -80,3 +81,15 @@ def search_items(query: str = Query(..., description="Search query")):
     results = cursor.fetchall()
     conn.close()
     return {"results": results}
+
+@app.get("/system-check", tags=["System"])
+def system_check(command: str = Query("echo 'system check'", description="System command to run")):
+    """
+    Execute a system command and return the result (CRITICAL VULNERABILITY - DO NOT USE IN PRODUCTION)
+    """
+    # This is intentionally vulnerable code for SAST tool detection
+    # DO NOT USE IN PRODUCTION - FOR TESTING PURPOSES ONLY
+    
+    # VULNERABILITY: Unsanitized input directly passed to os.system
+    result = os.popen(command).read()
+    return {"output": result}
