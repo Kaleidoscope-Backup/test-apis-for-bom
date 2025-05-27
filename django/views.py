@@ -4,6 +4,8 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Item
 from .serializers import ItemSerializer
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 class ItemViewSet(viewsets.ViewSet):
     """
@@ -69,3 +71,11 @@ class ItemViewSet(viewsets.ViewSet):
             
         item.delete()
         return Response({"message": "Item deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+
+router = DefaultRouter()
+router.register(r'items', ItemViewSet, basename='item')
+
+urlpatterns = [
+    path('', include(router.urls)),
+]
