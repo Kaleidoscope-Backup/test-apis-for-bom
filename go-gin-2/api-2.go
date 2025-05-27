@@ -1,9 +1,11 @@
+// source: https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo
+
 package main
 
 import (
 	"context"
-	"log"
-	"net/http"
+	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,31 +14,73 @@ import (
 )
 
 var collection *mongo.Collection
+var ctx = context.TODO()
 
 func main() {
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	collection = client.Database("mydb").Collection("users")
+	router := gin.Default()
 
-	r := gin.Default()
-	r.GET("/user", getUser)
-	r.Run(":8080")
+	router.GET("/user/:name", func(c *gin.Context) {
+
+		world, _ := c.Cookie("world")
+
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+		client, _ := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://foo:bar@localhost:27017"))
+
+		collection := client.Database("baz").Collection("qux")
+
+		//ruleid: gin-mongo-nosqli-taint
+		res, _ := collection.InsertOne(context.Background(), bson.M{"hello": world})
+		fmt.Println(res)
+
+		result := struct {
+			Foo string
+			Bar int32
+		}{}
+
+		filter := bson.D{{"hello", world}}
+		//ruleid: gin-mongo-nosqli-taint
+		collection.FindOne(context.Background(), filter).Decode(&result)
+
+		//ruleid: gin-mongo-nosqli-taint
+		res, _ = collection.InsertOne(context.Background(), bson.M{"hello": result.Foo})
+
+	})
+
 }
 
-func getUser(c *gin.Context) {
-	// Vulnerable: Directly using user input in query
-	username := c.Query("username")
+func goodstuff() {
 
-	var result bson.M
-	err := collection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&result)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
+	router := gin.Default()
 
-	c.JSON(http.StatusOK, result)
+	router.GET("/user/:name", func(c *gin.Context) {
+
+		world := "world"
+
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+		client, _ := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://foo:bar@localhost:27017"))
+
+		collection := client.Database("baz").Collection("qux")
+
+		//ok: gin-mongo-nosqli-taint
+		res, _ := collection.InsertOne(context.Background(), bson.M{"hello": world})
+
+		fmt.Println(res)
+
+		result := struct {
+			Foo string
+			Bar int32
+		}{}
+
+		filter := bson.D{{"hello", world}}
+		//ok: gin-mongo-nosqli-taint
+		collection.FindOne(context.Background(), filter).Decode(&result)
+
+		//ok: gin-mongo-nosqli-taint
+		res, _ = collection.InsertOne(context.Background(), bson.M{"hello": result.Foo})
+		fmt.Println(res)
+
+	})
 }
