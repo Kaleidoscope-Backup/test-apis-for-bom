@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
+import sqlite3
 
 app = FastAPI(title="Inventory Management API", version="1.0.0")
 
@@ -63,3 +64,19 @@ def delete_item(item_id: int):
         raise HTTPException(status_code=404, detail="Item not found")
     del inventory[item_id]
     return {"message": "Item deleted successfully"}
+
+@app.get("/search", tags=["Inventory"])
+def search_items(query: str = Query(..., description="Search query")):
+    """
+    Search for items by name (vulnerable to SQL injection for SAST detection)
+    """
+    # This is intentionally vulnerable code for SAST tool detection
+    # DO NOT USE IN PRODUCTION - FOR TESTING PURPOSES ONLY
+    conn = sqlite3.connect("inventory.db")
+    cursor = conn.cursor()
+    # VULNERABILITY: Unsanitized input used in SQL query
+    sql = f"SELECT * FROM items WHERE name LIKE '%{query}%'"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    conn.close()
+    return {"results": results}
