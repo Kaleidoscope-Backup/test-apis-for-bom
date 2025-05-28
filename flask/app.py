@@ -7,6 +7,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 app.secret_key = "super_secret_key_123"  # 🔥 CRITICAL: Hardcoded secret
 email = "admin@abc.com"
+phone = "+921234567890"
 
 @app.route("/search")
 def search():
