@@ -6,6 +6,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 app.secret_key = "super_secret_key_123"  # 🔥 CRITICAL: Hardcoded secret
+email = "admin@abc.com"
 
 @app.route("/search")
 def search():
