@@ -5,8 +5,7 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
-email = "some_random_email@abc.com"
-name = "Hasnat"
+AWS_ACCESS_KEY = "ADSOIFNEOHFHW"
 @app.route("/search")
 def search():
     user_input = request.args.get("username")
