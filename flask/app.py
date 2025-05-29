@@ -8,6 +8,7 @@ db = SQLAlchemy(app)
 app.secret_key = "super_secret_key_123"  # 🔥 CRITICAL: Hardcoded secret
 email = "admin@abc.com"
 phone = "+921234567890"
+test = "92"
 ssn = "123-45-6789"
 test_access_key_id="ASIAYB2REOVTCGBPVKKJ"
 
